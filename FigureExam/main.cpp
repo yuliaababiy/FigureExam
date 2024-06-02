@@ -11,7 +11,7 @@ void displayFigure(vector<Figure<T>*>& figures)
 {
 	for (auto figure : figures)
 	{
-		figure->display;
+		figure->display();
 	}
 }
  
@@ -29,18 +29,19 @@ template<typename T>
 void loadFromFile(vector<Figure<T>*>& figures, string filename)
 {
 	ifstream file(filename);
-	int area, perimeter;
-	string type, color, sideA, sideB, sideC;
-	string type;
-	while (file >> type >> area >> type >> perimeter >> color)
+	int area, perimeter, sideA, sideB, sideC;
+	string type, color;
+	string figureType;
+	while (file >> type >> area >> figureType >> perimeter >> color)
 	{
 		if (type == "Figure")
 		{
-			figures.push_back(new Figure<T>(area, type, perimeter, color));
+			figures.push_back(new Figure<T>(area, figureType, perimeter, color));
 		}
 		else if (type == "Triangle")
 		{
-			figures.push_back(new Triangle<T>(sideA, sideB, sideC));
+			file >> sideA >> sideB >> sideC;
+			figures.push_back(new Triangle<T>(area, figureType, perimeter, color, sideA, sideB, sideC));
 		}
 	}
 }
@@ -66,11 +67,11 @@ int main()
 			loadFromFile(figures, "input.txt");
 			displayFigure(figures);
 		}
-		if (choice == 2)
+		else if (choice == 2)
 		{
-			string type;
-			int area, perimeter;
-			string type, color, sideA, sideB, sideC;
+			string type; // щоб знати який клас
+			int area, perimeter, sideA, sideB, sideC;
+			string figureType, color;
 			cout << "Enter type: ";
 			cin >> type;
 			if (type == "Figure")
@@ -78,12 +79,12 @@ int main()
 				cout << "Enter area: ";
 				cin >> area;
 				cout << "Enter type: ";
-				cin >> type;
+				cin >> figureType;
 				cout << "Enter perimeter: ";
 				cin >> perimeter;
 				cout << "Enter color: ";
 				cin >> color;
-				Figure<int>* f = new Figure<int>(area, type, perimeter, color);
+				Figure<int>* f = new Figure<int>(area, figureType, perimeter, color);
 				f->saveWithSpaces(file);
 			}
 			else if (type == "Triangle")
@@ -91,7 +92,7 @@ int main()
 				cout << "Enter area: ";
 				cin >> area;
 				cout << "Enter type: ";
-				cin >> type;
+				cin >> figureType;
 				cout << "Enter perimeter: ";
 				cin >> perimeter;
 				cout << "Enter color: ";
@@ -103,7 +104,7 @@ int main()
 				cout << "Enter sideC: ";
 				cin >> sideC;
 
-				Triangle<int>* f = new Triangle<int>(area, type, perimeter, color, sideA, sideB, sideC);
+				Triangle<int>* f = new Triangle<int>(area, figureType, perimeter, color, sideA, sideB, sideC);
 				f->saveWithSpaces(file);
 			}
 			else
@@ -135,12 +136,21 @@ int main()
 				{
 					biggest = f;
 				}
-				cout << "The biggest perimeter: ";
-				biggest->display();
-				cout << endl;
 			}
+			cout << "The biggest perimeter: ";
+			biggest->display();
+			cout << endl;
 		}
-		//else if (choice == 6) // find average perimeter all figures: " <
+		else if (choice == 6)
+		{
+			loadFromFile(figures, "input.txt");
+			int allPerimeters = 0;
+			for (auto f : figures)
+			{
+				allPerimeters += f->getPerimeter();
+			}
+			cout << allPerimeters / figures.size()<<endl;
+		}
 		else if (choice == 7)
 		{
 			break;
